@@ -1,0 +1,104 @@
+// ▼ この3行を追加！これがWebアプリの「玄関」になります
+function doGet() {
+  // HTMLファイルを作る
+  var output = HtmlService.createHtmlOutputFromFile('index');
+
+  // ▼ 追加：外側の箱（iframe）にも「スマホ対応」を強制する魔法！
+  output.addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  
+  // ついでにタイトルも設定しておきましょう
+  output.setTitle('契約管理システム');
+
+  return output;
+}
+
+
+// ...下にさっきの checkLogin とかが続きます...
+
+function testLogin() {
+  // ここで「入力されたつもり」のテストデータを決めます
+  var inputEmail = "test@email.com";
+  var inputPass = "password123";
+
+  // 判定機能（ロボット）を呼び出して結果を聞く
+  var result = checkLogin(inputEmail, inputPass);
+  
+  // 結果をログに出す
+  if (result) {
+    Logger.log("🎉 ログイン成功！ようこそ、" + result + "さん");
+  } else {
+    Logger.log("😱 ログイン失敗…メアドかパスワードが違います");
+  }
+}
+
+// ▼ ここがログイン判定をする「裏側」の本体です！
+function checkLogin(email, password) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ユーザー管理");
+  
+  // ▼ 追加：もしシートが見つからなかったら、ここで教えてあげる！
+  if (sheet === null) {
+    Logger.log("エラー！！「ユーザー管理」という名前のシートが見つかりません。名前を確認してください！");
+    return false; // ここで処理を中断
+  }
+
+  var lastRow = sheet.getLastRow();
+  
+  if (lastRow < 2) return false;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
+
+  for (var i = 0; i < data.length; i++) {
+    var dbEmail = data[i][0];
+    var dbPass = data[i][1]; 
+    var dbName = data[i][2]; 
+
+  // ▼ ここが変わります！
+    // 1. 入力されたパスワードを、同じルールでハッシュ化する
+    var inputHash = createHash(password);
+
+    // 2. 「データベースのハッシュ値」と「入力されたハッシュ値」を比べる
+    if (dbEmail === email && dbPass === inputHash) {
+      return dbName; 
+    }
+  }
+
+  return false;
+}
+
+// ▼▼▼ 追加：パスワードをハッシュ化（暗号のような文字）にする関数 ▼▼▼
+function createHash(password) {
+  var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password);
+  var txtHash = rawHash.map(function(b) {
+    return ("0" + (b < 0 ? b + 256 : b).toString(16)).slice(-2);
+  }).join("");
+  return txtHash;
+}
+
+// ▼▼▼ 実験用：今の「password123」を変換してみる関数 ▼▼▼
+function showMyHash() {
+  var hash = createHash("password123"); // ここを変えれば別のパスワードも作れます
+  Logger.log(hash);
+}
+
+// ▼▼▼ 追加：新規ユーザー登録をする関数 ▼▼▼
+function registerUser(email, password, username) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ユーザー管理");
+  
+  // 1. 重複チェック（既に同じメアドの人がいないか確認）
+  var data = sheet.getDataRange().getValues();
+  // 2行目から最後まで見る
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === email) {
+      return "ERROR_EXIST"; // 「もういるよ！」と返す
+    }
+  }
+
+  // 2. パスワードをハッシュ化（暗号化）
+  // ※さっき作った createHash 関数を使います！
+  var passHash = createHash(password); 
+
+  // 3. シートの一番下に追加
+  sheet.appendRow([email, passHash, username]);
+  
+  return "SUCCESS"; // 「登録できたよ！」と返す
+}

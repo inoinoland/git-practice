@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <style>
+      /* ▼▼▼ 基本設定 ▼▼▼ */
+      * { box-sizing: border-box; }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #FAFAFA;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* アニメーションでふわっと表示 */
+        animation: fadeIn 0.3s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .password-wrapper {
+        width: 100%;
+        position: relative;
+        margin-bottom: 16px;
+        z-index: 1;
+      }
+
+      input {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        border: 1px solid #CCC;
+        border-radius: 8px;
+        font-size: 16px;
+        background-color: #fff;
+        outline: none;
+        transition: 0.2s;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .password-wrapper input {
+        margin-bottom: 0;
+        padding-right: 50px; 
+      }
+
+      input:focus {
+        border-color: #2D9CDB;
+        box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.15);
+      }
+
+      /* アイコンスタイル */
+      .toggle-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        border-radius: 50%;
+        transition: 0.2s;
+        z-index: 10;
+      }
+      .toggle-eye svg { width: 24px; height: 24px; fill: #aaa; transition: 0.2s; }
+      .toggle-eye:hover { background-color: rgba(0,0,0,0.05); }
+      .toggle-eye:hover svg { fill: #2D9CDB; }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background-color: #2D9CDB;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 100px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(45, 156, 219, 0.3);
+        transition: 0.2s;
+        margin-top: 10px;
+        position: relative;
+        z-index: 5;
+      }
+
+      button:active {
+        transform: scale(0.98);
+        background-color: #2680B3;
+        box-shadow: none;
+      }
+
+      /* サブボタン（切り替え用） */
+      .sub-link {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #2D9CDB;
+        cursor: pointer;
+        background: none;
+        border: none;
+        text-decoration: underline;
+      }
+
+      .message {
+        margin-top: 20px;
+        min-height: 24px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .loader {
+        border: 3px solid rgba(45, 156, 219, 0.2);
+        border-top: 3px solid #2D9CDB;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+      .card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      }
+      .card p {
+        font-size: 16px;
+        margin: 10px 0;
+        border-bottom: 1px solid #f5f5f5;
+        padding-bottom: 8px;
+      }
+
+      /* ▼▼▼ スマホ用（900px以下） ▼▼▼ */
+      @media screen and (max-width: 900px) {
+        h1 { font-size: 28px; margin-bottom: 32px; }
+        
+        input {
+          padding: 24px !important; 
+          font-size: 22px !important;
+          margin-bottom: 24px;
+          border-width: 2px;
+          border-radius: 16px;
+        }
+        
+        .password-wrapper input {
+           margin-bottom: 0 !important;
+           padding-right: 60px !important;
+        }
+        .password-wrapper { margin-bottom: 24px; }
+        .toggle-eye { right: 16px; }
+        .toggle-eye svg { width: 28px; height: 28px; }
+
+        button {
+          padding: 24px !important;
+          font-size: 24px !important;
+          margin-top: 16px;
+          box-shadow: 0 6px 12px rgba(45, 156, 219, 0.4);
+        }
+        
+        .card { padding: 32px; border-radius: 20px; }
+        .card p { font-size: 20px !important; padding-bottom: 12px; }
+        .message { font-size: 18px; margin-top: 30px; }
+        .sub-link { font-size: 16px; margin-top: 30px; }
+        .loader { width: 30px; height: 30px; border-width: 4px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login-screen" class="container">
+      <h1>契約管理システム</h1>
+      <input type="text" id="email" placeholder="メールアドレス">
+      
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="パスワード">
+        <span class="toggle-eye" onclick="togglePass('password', 'icon-login-open', 'icon-login-closed')">
+          <svg id="icon-login-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          <svg id="icon-login-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+        </span>
+      </div>
+
+      <button onclick="startLogin()">ログイン</button>
+      <button class="sub-link" onclick="showRegister()">初めての方はこちら（登録）</button>
+      <p id="msg-login" class="message"></p>
+    </div>
+
+    <div id="register-screen" class="container" style="display: none;">
+      <h1>新規ユーザー登録</h1>
+      <input type="text" id="reg-name" placeholder="お名前（ユーザー名）">
+      <input type="text" id="reg-email" placeholder="メールアドレス">
+      
+      <div class="password-wrapper">
+        <input type="password" id="reg-password" placeholder="パスワード">
+        <span class="toggle-eye" onclick="togglePass('reg-password', 'icon-reg-open', 'icon-reg-closed')">
+          <svg id="icon-reg-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          <svg id="icon-reg-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+        </span>
+      </div>
+
+      <button onclick="startRegister()">登録する</button>
+      <button class="sub-link" onclick="showLogin()">ログイン画面に戻る</button>
+      <p id="msg-reg" class="message"></p>
+    </div>
+
+    <div id="main-screen" class="container" style="display: none;">
+      <h1>🎉 ようこそ<br><span id="user-name"></span>さん！</h1>
+      <div class="card">
+        <p style="color:#888; font-size:14px;">あなたの契約リスト</p>
+        <p>A社 業務委託契約</p>
+        <p>B社 準委任契約</p>
+        <button onclick="logout()" style="background-color: #EEE; color:#555; margin-top:30px; box-shadow: none;">ログアウト</button>
+      </div>
+    </div>
+
+    <script>
+      // 画面切り替え：登録へ
+      function showRegister() {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("register-screen").style.display = "flex";
+        document.getElementById("msg-login").innerHTML = "";
+      }
+
+      // 画面切り替え：ログインへ
+      function showLogin() {
+        document.getElementById("register-screen").style.display = "none";
+        document.getElementById("login-screen").style.display = "flex";
+        document.getElementById("msg-reg").innerHTML = "";
+      }
+
+      // ログイン処理
+      function startLogin() {
+        var email = document.getElementById("email").value;
+        var pass = document.getElementById("password").value;
+        var msg = document.getElementById("msg-login");
+        msg.innerHTML = '<div class="loader"></div>';
+
+        google.script.run
+          .withSuccessHandler(function(resultName) {
+            if (resultName) {
+              document.getElementById("login-screen").style.display = "none";
+              document.getElementById("main-screen").style.display = "flex";
+              document.getElementById("user-name").innerText = resultName;
+              msg.innerHTML = "";
+            } else {
+              msg.innerText = "😱 エラー：メールかパスワードが違います";
+              msg.style.color = "red";
+            }
+          })
+          .checkLogin(email, pass);
+      }
+
+      // ★追加：登録処理
+      function startRegister() {
+        var name = document.getElementById("reg-name").value;
+        var email = document.getElementById("reg-email").value;
+        var pass = document.getElementById("reg-password").value;
+        var msg = document.getElementById("msg-reg");
+
+        if (!name || !email || !pass) {
+          msg.innerText = "⚠️ 全部の項目を入力してください";
+          msg.style.color = "orange";
+          return;
+        }
+
+        msg.innerHTML = '<div class="loader"></div>';
+
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result === "SUCCESS") {
+              // 成功したらそのままログイン状態にする！
+              document.getElementById("register-screen").style.display = "none";
+              document.getElementById("main-screen").style.display = "flex";
+              document.getElementById("user-name").innerText = name;
+              msg.innerHTML = "";
+            } else if (result === "ERROR_EXIST") {
+              msg.innerText = "😱 そのメールアドレスは既に登録されています";
+              msg.style.color = "red";
+            } else {
+              msg.innerText = "😱 エラーが発生しました";
+              msg.style.color = "red";
+            }
+          })
+          .registerUser(email, pass, name);
+      }
+
+      function logout() {
+        location.reload();
+      }
+
+      // 共通：パスワード表示切り替え（IDを指定できるようにパワーアップ！）
+      function togglePass(inputId, iconOpenId, iconClosedId) {
+        var input = document.getElementById(inputId);
+        var iconOpen = document.getElementById(iconOpenId);
+        var iconClosed = document.getElementById(iconClosedId);
+
+        if (input.type === "password") {
+          input.type = "text";
+          iconOpen.style.display = "none";
+          iconClosed.style.display = "block";
+        } else {
+          input.type = "password";
+          iconOpen.style.display = "block";
+          iconClosed.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
