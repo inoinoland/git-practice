@@ -102,3 +102,25 @@ function registerUser(email, password, username) {
   
   return "SUCCESS"; // 「登録できたよ！」と返す
 }
+
+// ▼▼▼ 追加：特定のユーザーの契約リストを取得する関数 ▼▼▼
+function getContractList(targetEmail) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("契約リスト");
+  var data = sheet.getDataRange().getValues();
+  
+  var myContracts = []; // ここに見つかった契約を入れていく箱
+
+  // 2行目から最後までチェック！
+  for (var i = 1; i < data.length; i++) {
+    // A列（0番目）が、ログイン中のメアドと同じなら？
+    if (data[i][0] === targetEmail) {
+      // リストに追加（B列：会社名、C列：契約内容）
+      myContracts.push({
+        company: data[i][1],
+        detail: data[i][2]
+      });
+    }
+  }
+  
+  return myContracts; // 見つかったリストを全部返す！
+}
