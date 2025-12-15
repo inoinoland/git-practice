@@ -3,316 +3,271 @@
   <head>
     <base target="_top">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <style>
-      /* ▼▼▼ 基本設定 ▼▼▼ */
+      /* ▼▼▼ デザイン設定 ▼▼▼ */
       * { box-sizing: border-box; }
-      
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: #FAFAFA;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        color: #333;
+        background-color: #FAFAFA; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: 100vh; margin: 0; padding: 20px; color: #333;
       }
+      h1 { font-size: 24px; font-weight: bold; margin-bottom: 24px; text-align: center; }
+      .container { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; animation: fadeIn 0.3s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-      h1 {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 24px;
-        text-align: center;
+      /* 入力フォーム */
+      input, select {
+        display: block; width: 100%; padding: 12px 16px; margin-bottom: 16px;
+        border: 1px solid #CCC; border-radius: 8px; font-size: 16px; background-color: #fff;
+        outline: none; transition: 0.2s;
       }
-
-      .container {
-        width: 100%;
-        max-width: 400px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        animation: fadeIn 0.3s ease-in-out;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      .password-wrapper {
-        width: 100%;
-        position: relative;
-        margin-bottom: 16px;
-        z-index: 1;
-      }
-
-      input {
-        display: block;
-        width: 100%;
-        padding: 12px 16px;
-        margin-bottom: 16px;
-        border: 1px solid #CCC;
-        border-radius: 8px;
-        font-size: 16px;
-        background-color: #fff;
-        outline: none;
-        transition: 0.2s;
-        position: relative;
-        z-index: 2;
-      }
+      input:focus, select:focus { border-color: #2D9CDB; box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.15); }
       
-      .password-wrapper input { margin-bottom: 0; padding-right: 50px; }
-      input:focus { border-color: #2D9CDB; box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.15); }
-
-      .toggle-eye {
-        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-        cursor: pointer; background: none; border: none; padding: 8px;
-        display: flex; align-items: center; border-radius: 50%; transition: 0.2s; z-index: 10;
-      }
-      .toggle-eye svg { width: 24px; height: 24px; fill: #aaa; transition: 0.2s; }
-      .toggle-eye:hover { background-color: rgba(0,0,0,0.05); }
-      .toggle-eye:hover svg { fill: #2D9CDB; }
-
       button {
         width: 100%; padding: 14px; background-color: #2D9CDB; color: white;
         font-size: 16px; font-weight: bold; border: none; border-radius: 100px;
-        cursor: pointer; box-shadow: 0 4px 8px rgba(45, 156, 219, 0.3);
-        transition: 0.2s; margin-top: 10px; position: relative; z-index: 5;
+        cursor: pointer; box-shadow: 0 4px 8px rgba(45, 156, 219, 0.3); transition: 0.2s; margin-top: 10px;
       }
       button:active { transform: scale(0.98); background-color: #2680B3; box-shadow: none; }
-
-      .sub-link {
-        margin-top: 20px; font-size: 14px; color: #2D9CDB; cursor: pointer;
-        background: none; border: none; text-decoration: underline;
-      }
-
-      .message {
-        margin-top: 20px; min-height: 24px; font-size: 14px; font-weight: bold;
-        text-align: center; display: flex; justify-content: center; align-items: center;
-      }
+      .btn-cancel { background-color: #EEE; color: #555; margin-top: 10px; box-shadow: none; }
       
+      .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #eee; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+      /* ▼▼▼ ★SVGローディング（絶対に線が出ないプロ仕様！） ▼▼▼ */
       .loader {
-        border: 3px solid rgba(45, 156, 219, 0.2); border-top: 3px solid #2D9CDB;
-        border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite;
+        animation: rotate 2s linear infinite;
+        width: 40px; height: 40px; margin: 0 auto;
       }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .loader .path {
+        stroke: #2D9CDB; /* 線の色 */
+        stroke-linecap: round;
+        animation: dash 1.5s ease-in-out infinite;
+      }
+      @keyframes rotate { 100% { transform: rotate(360deg); } }
+      @keyframes dash {
+        0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+        50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+        100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+      }
 
-      .card {
-        background: white; padding: 24px; border-radius: 12px;
-        border: 1px solid #eee; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      /* 全画面ローディング */
+      #loading-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #FAFAFA; z-index: 2000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
       }
-      
-      /* ▼▼▼ リスト表示用のスタイル（ここから変更） ▼▼▼ */
-      .list-title { color: #888; font-size: 14px; margin-bottom: 10px; }
-      
-      /* データ1件ごとのデザイン */
-      .contract-item {
-        border-bottom: 1px solid #f5f5f5;
-        padding: 12px 0;
-        animation: fadeIn 0.5s ease;
-      }
+
+      /* リスト表示用 */
+      .list-title { color: #888; font-size: 14px; margin-bottom: 16px; }
+      .contract-item { border-bottom: 1px solid #f0f0f0; padding: 16px 0; animation: fadeIn 0.5s ease; position: relative; }
       .contract-item:last-child { border-bottom: none; }
-      
-      .company-name { font-size: 16px; font-weight: bold; display: block; }
-      .contract-detail { font-size: 14px; color: #666; display: block; margin-top: 4px;}
-      
-      /* データがない時の表示 */
+      .project-name { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 8px; display: block; }
+      .info-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; align-items: center; }
+      .info-label { font-size: 12px; color: #999; margin-right: 4px; }
+      .info-text { font-size: 14px; color: #555; }
+      .tags-row { display: flex; gap: 8px; margin-top: 8px; }
+      .tag { font-size: 12px; padding: 4px 10px; border-radius: 4px; background-color: #F0F8FF; color: #2D9CDB; font-weight: bold; }
       .no-data { color: #aaa; text-align: center; padding: 20px 0; font-size: 14px; }
-      /* ▲▲▲ 変更ここまで ▲▲▲ */
 
-      @media screen and (max-width: 900px) {
-        h1 { font-size: 28px; margin-bottom: 32px; }
-        input { padding: 24px !important; font-size: 22px !important; margin-bottom: 24px; border-width: 2px; border-radius: 16px; }
-        .password-wrapper input { margin-bottom: 0 !important; padding-right: 60px !important; }
-        .password-wrapper { margin-bottom: 24px; }
-        .toggle-eye { right: 16px; } .toggle-eye svg { width: 28px; height: 28px; }
-        button { padding: 24px !important; font-size: 24px !important; margin-top: 16px; box-shadow: 0 6px 12px rgba(45, 156, 219, 0.4); }
-        .card { padding: 32px; border-radius: 20px; }
-        
-        /* スマホ用のリスト表示調整 */
-        .company-name { font-size: 20px; }
-        .contract-detail { font-size: 16px; }
-        
-        .message { font-size: 18px; margin-top: 30px; }
-        .sub-link { font-size: 16px; margin-top: 30px; }
-        .loader { width: 30px; height: 30px; border-width: 4px; }
+      /* 編集ボタン（シンプル版） */
+      .edit-btn {
+        position: absolute; top: 12px; right: 8px;
+        width: 36px; height: 36px; border-radius: 50%; cursor: pointer; z-index: 10;
+        display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+        color: #aaa;
       }
+      .edit-btn:hover { background-color: rgba(0,0,0,0.05); color: #2D9CDB; transform: scale(1.1); }
+      .edit-btn svg { fill: currentColor; }
+
+      /* モーダル */
+      #edit-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: none;
+        justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+      }
+      .modal-content {
+        background: white; width: 100%; max-width: 450px; padding: 24px; border-radius: 16px;
+        max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease;
+      }
+      @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+      .modal-label { font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; display: block; }
     </style>
   </head>
   <body>
-    <div id="login-screen" class="container">
-      <h1>契約管理システム</h1>
-      <input type="text" id="email" placeholder="メールアドレス">
-      <div class="password-wrapper">
-        <input type="password" id="password" placeholder="パスワード">
-        <span class="toggle-eye" onclick="togglePass('password', 'icon-login-open', 'icon-login-closed')">
-          <svg id="icon-login-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-          <svg id="icon-login-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
-        </span>
-      </div>
-      <button onclick="startLogin()">ログイン</button>
-      <button class="sub-link" onclick="showRegister()">初めての方はこちら（登録）</button>
-      <p id="msg-login" class="message"></p>
+
+    <div id="loading-screen">
+      <svg class="loader" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+      <p style="margin-top: 20px; color: #666;">認証中...</p>
     </div>
 
-    <div id="register-screen" class="container" style="display: none;">
-      <h1>新規ユーザー登録</h1>
-      <input type="text" id="reg-name" placeholder="お名前（ユーザー名）">
-      <input type="text" id="reg-email" placeholder="メールアドレス">
-      <div class="password-wrapper">
-        <input type="password" id="reg-password" placeholder="パスワード">
-        <span class="toggle-eye" onclick="togglePass('reg-password', 'icon-reg-open', 'icon-reg-closed')">
-          <svg id="icon-reg-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-          <svg id="icon-reg-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
-        </span>
+    <div id="signup-screen" class="container" style="display: none;">
+      <h1>はじめまして！</h1>
+      <div class="card" style="text-align: center;">
+        <p style="margin-bottom: 24px;">アプリ内で表示する<br>あなたのお名前を教えてください。</p>
+        <form onsubmit="event.preventDefault(); doSignup();" style="width: 100%;">
+          <input type="text" id="signup-name" placeholder="例：山田 太郎">
+          <button type="submit">はじめる</button>
+        </form>
+        <p style="font-size: 12px; color: #888; margin-top: 16px;">
+          ログイン中のアカウント:<br><span id="signup-email" style="font-weight: bold;"></span>
+        </p>
       </div>
-      <button onclick="startRegister()">登録する</button>
-      <button class="sub-link" onclick="showLogin()">ログイン画面に戻る</button>
-      <p id="msg-reg" class="message"></p>
     </div>
 
     <div id="main-screen" class="container" style="display: none;">
-      <h1>🎉 ようこそ<br><span id="user-name"></span>さん！</h1>
+      <h1>契約管理システム</h1>
       <div class="card">
+        <h3 style="text-align: center; margin-bottom: 20px;">🎉 ようこそ <br><span id="user-name"></span> さん</h3>
         <p class="list-title">あなたの契約リスト</p>
-        
-        <div id="contract-list">
-           <div class="loader" style="margin: 20px auto;"></div> </div>
+        <div id="contract-list"></div>
+      </div>
+    </div>
 
-        <button onclick="logout()" style="background-color: #EEE; color:#555; margin-top:30px; box-shadow: none;">ログアウト</button>
+    <div id="error-screen" class="container" style="display: none;">
+      <h1>アクセス権限なし</h1>
+      <div class="card" style="text-align: center;">
+        <p style="color: #666; margin-bottom: 20px;">あなたのGoogleアカウント<br>
+        <span id="error-email" style="font-weight:bold; color: #333;"></span><br>
+        は登録されていません。</p>
+        <p style="font-size: 14px; color: #888;">管理者に連絡して、<br>ユーザー管理シートへの追加を依頼してください。</p>
+      </div>
+    </div>
+
+    <div id="edit-modal">
+      <div class="modal-content">
+        <div class="modal-title">契約内容の編集</div>
+        <input type="hidden" id="edit-row">
+        <span class="modal-label">案件名</span><input type="text" id="edit-project">
+        <span class="modal-label">契約者名</span><input type="text" id="edit-contractor">
+        <span class="modal-label">紹介元</span><input type="text" id="edit-referrer">
+        <span class="modal-label">購買稟議</span>
+        <select id="edit-approval"><option value="未承認">未承認</option><option value="承認済">承認済</option></select>
+        <span class="modal-label">契約申請</span>
+        <select id="edit-application"><option value="未申請">未申請</option><option value="申請済">申請済</option></select>
+        <span class="modal-label">契約満了日</span><input type="text" id="edit-expiry">
+        <span class="modal-label">金額</span><input type="text" id="edit-amount">
+        <span class="modal-label">メモ</span><input type="text" id="edit-memo">
+        <button onclick="saveEdit()">保存する</button>
+        <button onclick="closeEdit()" class="btn-cancel">キャンセル</button>
+        <p id="msg-edit" class="message"></p>
       </div>
     </div>
 
     <script>
-      var currentUserEmail = ""; // 今ログインしてる人のメアドを覚えておく変数
+      var currentUserEmail = "";
+      var allContracts = [];
 
-      function showRegister() {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("register-screen").style.display = "flex";
-        document.getElementById("msg-login").innerHTML = "";
+      // ★便利機能：きれいなローダーのHTMLを返す関数
+      function getLoaderHtml() {
+        return '<svg class="loader" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>';
       }
 
-      function showLogin() {
-        document.getElementById("register-screen").style.display = "none";
-        document.getElementById("login-screen").style.display = "flex";
-        document.getElementById("msg-reg").innerHTML = "";
-      }
+      window.onload = function() {
+        google.script.run.withSuccessHandler(function(user) {
+          document.getElementById("loading-screen").style.display = "none";
+          currentUserEmail = user.email;
 
-      // ログイン処理
-      function startLogin() {
-        var email = document.getElementById("email").value;
-        var pass = document.getElementById("password").value;
-        var msg = document.getElementById("msg-login");
-        msg.innerHTML = '<div class="loader"></div>';
+          if (user.isRegistered) {
+            showMainScreen(user.name);
+          } else {
+            document.getElementById("signup-screen").style.display = "flex";
+            document.getElementById("signup-email").innerText = user.email;
+          }
+        }).getLoginUser();
+      };
 
+      function doSignup() {
+        var name = document.getElementById("signup-name").value;
+        if (!name) return;
+
+        // ★ここでSVGローダーを使う
+        document.getElementById("signup-screen").innerHTML = getLoaderHtml() + '<p style="text-align:center; margin-top:20px;">登録中...</p>';
+        
         google.script.run
-          .withSuccessHandler(function(resultName) {
-            if (resultName) {
-              currentUserEmail = email; // 成功したらメアドを覚えておく！
-              document.getElementById("login-screen").style.display = "none";
-              document.getElementById("main-screen").style.display = "flex";
-              document.getElementById("user-name").innerText = resultName;
-              msg.innerHTML = "";
-              
-              // ★追加：ログイン成功直後にデータを読み込みに行く！
-              loadContracts();
-            } else {
-              msg.innerText = "😱 エラー：メールかパスワードが違います";
-              msg.style.color = "red";
-            }
+          .withSuccessHandler(function(res) {
+             document.getElementById("signup-screen").style.display = "none";
+             showMainScreen(name);
           })
-          .checkLogin(email, pass);
+          .registerGoogleUser(name);
       }
 
-      // 登録処理
-      function startRegister() {
-        var name = document.getElementById("reg-name").value;
-        var email = document.getElementById("reg-email").value;
-        var pass = document.getElementById("reg-password").value;
-        var msg = document.getElementById("msg-reg");
-
-        if (!name || !email || !pass) {
-          msg.innerText = "⚠️ 全部の項目を入力してください";
-          msg.style.color = "orange";
-          return;
-        }
-
-        msg.innerHTML = '<div class="loader"></div>';
-
-        google.script.run
-          .withSuccessHandler(function(result) {
-            if (result === "SUCCESS") {
-              currentUserEmail = email; // メアドを覚えておく
-              document.getElementById("register-screen").style.display = "none";
-              document.getElementById("main-screen").style.display = "flex";
-              document.getElementById("user-name").innerText = name;
-              msg.innerHTML = "";
-              
-              // ★追加：登録成功時もデータを読み込みに行く！
-              loadContracts();
-            } else if (result === "ERROR_EXIST") {
-              msg.innerText = "😱 そのメールアドレスは既に登録されています";
-              msg.style.color = "red";
-            } else {
-              msg.innerText = "😱 エラーが発生しました";
-              msg.style.color = "red";
-            }
-          })
-          .registerUser(email, pass, name);
+      function showMainScreen(name) {
+        document.getElementById("main-screen").style.display = "flex";
+        document.getElementById("user-name").innerText = name;
+        loadContracts();
       }
 
-      // ▼▼▼ 追加：契約データを取ってきて表示する関数 ▼▼▼
       function loadContracts() {
         var listContainer = document.getElementById("contract-list");
-        // とりあえずぐるぐるを表示
-        listContainer.innerHTML = '<div class="loader" style="margin: 20px auto;"></div>';
+        // ★ここでもSVGローダーを使う
+        listContainer.innerHTML = getLoaderHtml();
 
-        // GASの getContractList 関数を呼び出す！
-        google.script.run
-          .withSuccessHandler(function(data) {
-            listContainer.innerHTML = ""; // ぐるぐるを消す
-
-            if (data.length === 0) {
-              // データがなかった時
-              listContainer.innerHTML = '<p class="no-data">まだ契約データがありません</p>';
-            } else {
-              // データがあった時：件数分だけループして箱を作る
-              for (var i = 0; i < data.length; i++) {
-                var item = data[i];
-                // HTMLを組み立てる（div class="contract-item"...）
-                var html = '<div class="contract-item">' +
-                           '<span class="company-name">' + item.company + '</span>' +
-                           '<span class="contract-detail">' + item.detail + '</span>' +
-                           '</div>';
-                
-                // 画面に追加！
-                listContainer.insertAdjacentHTML('beforeend', html);
-              }
-            }
-          })
-          .getContractList(currentUserEmail);
+        google.script.run.withSuccessHandler(function(data) {
+           allContracts = data;
+           listContainer.innerHTML = "";
+           if (data.length === 0) {
+             listContainer.innerHTML = '<p class="no-data">まだ契約データがありません</p>';
+           } else {
+             for (var i = 0; i < data.length; i++) {
+               var item = data[i];
+               var html = `
+                  <div class="contract-item">
+                    <div class="edit-btn" onclick="openEdit(${i})" title="編集">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/><path d="M0 0h24v24H0z" fill="none"/>
+                      </svg>
+                    </div>
+                    <span class="project-name">${item.project}</span>
+                    <div class="info-row"><span class="info-label">契約者:</span><span class="info-text">${item.contractor}</span><span style="margin:0 8px; color:#ddd;">|</span><span class="info-label">紹介元:</span><span class="info-text">${item.referrer}</span></div>
+                    <div class="info-row"><span class="info-label">金額:</span><span class="info-text" style="font-weight:bold;">${item.amount}</span><span style="margin:0 8px; color:#ddd;">|</span><span class="info-label">満了日:</span><span class="info-text">${item.expiryDate}</span></div>
+                    <div class="info-row"><span class="info-label">メモ:</span><span class="info-text">${item.memo}</span></div>
+                    <div class="tags-row"><span class="tag">稟議: ${item.approval}</span><span class="tag">申請: ${item.application}</span></div>
+                  </div>`;
+               listContainer.insertAdjacentHTML('beforeend', html);
+             }
+           }
+        }).getContractList(currentUserEmail);
       }
 
-      function logout() {
-        location.reload();
+      function openEdit(index) {
+        var item = allContracts[index];
+        document.getElementById("edit-row").value = item.row;
+        document.getElementById("edit-project").value = item.project;
+        document.getElementById("edit-contractor").value = item.contractor;
+        document.getElementById("edit-referrer").value = item.referrer;
+        document.getElementById("edit-approval").value = item.approval;
+        document.getElementById("edit-application").value = item.application;
+        document.getElementById("edit-expiry").value = item.expiryDate;
+        document.getElementById("edit-amount").value = item.amount;
+        document.getElementById("edit-memo").value = item.memo;
+        document.getElementById("edit-modal").style.display = "flex";
       }
 
-      function togglePass(inputId, iconOpenId, iconClosedId) {
-        var input = document.getElementById(inputId);
-        var iconOpen = document.getElementById(iconOpenId);
-        var iconClosed = document.getElementById(iconClosedId);
-        if (input.type === "password") {
-          input.type = "text";
-          iconOpen.style.display = "none";
-          iconClosed.style.display = "block";
-        } else {
-          input.type = "password";
-          iconOpen.style.display = "block";
-          iconClosed.style.display = "none";
-        }
+      function saveEdit() {
+        var row = document.getElementById("edit-row").value;
+        var project = document.getElementById("edit-project").value;
+        var contractor = document.getElementById("edit-contractor").value;
+        var referrer = document.getElementById("edit-referrer").value;
+        var approval = document.getElementById("edit-approval").value;
+        var application = document.getElementById("edit-application").value;
+        var expiryDate = document.getElementById("edit-expiry").value;
+        var amount = document.getElementById("edit-amount").value;
+        var memo = document.getElementById("edit-memo").value;
+        var msg = document.getElementById("msg-edit");
+        
+        // ★ここでもSVGローダーを使う
+        msg.innerHTML = getLoaderHtml();
+
+        google.script.run.withSuccessHandler(function(res) {
+          if (res === "SUCCESS") { closeEdit(); loadContracts(); }
+          else { msg.innerText = "エラーが発生しました"; }
+        }).updateContract(row, project, contractor, referrer, approval, expiryDate, application, amount, memo);
+      }
+
+      function closeEdit() {
+        document.getElementById("edit-modal").style.display = "none";
+        document.getElementById("msg-edit").innerText = "";
       }
     </script>
   </body>

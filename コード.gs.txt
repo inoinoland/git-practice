@@ -1,126 +1,84 @@
-// ▼ この3行を追加！これがWebアプリの「玄関」になります
 function doGet() {
-  // HTMLファイルを作る
   var output = HtmlService.createHtmlOutputFromFile('index');
-
-  // ▼ 追加：外側の箱（iframe）にも「スマホ対応」を強制する魔法！
   output.addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  
-  // ついでにタイトルも設定しておきましょう
   output.setTitle('契約管理システム');
-
   return output;
 }
 
-
-// ...下にさっきの checkLogin とかが続きます...
-
-function testLogin() {
-  // ここで「入力されたつもり」のテストデータを決めます
-  var inputEmail = "test@email.com";
-  var inputPass = "password123";
-
-  // 判定機能（ロボット）を呼び出して結果を聞く
-  var result = checkLogin(inputEmail, inputPass);
-  
-  // 結果をログに出す
-  if (result) {
-    Logger.log("🎉 ログイン成功！ようこそ、" + result + "さん");
-  } else {
-    Logger.log("😱 ログイン失敗…メアドかパスワードが違います");
-  }
-}
-
-// ▼ ここがログイン判定をする「裏側」の本体です！
-function checkLogin(email, password) {
+// ▼▼▼ 1. ログイン判定（勝手に登録しない版） ▼▼▼
+function getLoginUser() {
+  var email = Session.getActiveUser().getEmail();
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ユーザー管理");
-  
-  // ▼ 追加：もしシートが見つからなかったら、ここで教えてあげる！
-  if (sheet === null) {
-    Logger.log("エラー！！「ユーザー管理」という名前のシートが見つかりません。名前を確認してください！");
-    return false; // ここで処理を中断
-  }
-
-  var lastRow = sheet.getLastRow();
-  
-  if (lastRow < 2) return false;
-
-  var data = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
-
-  for (var i = 0; i < data.length; i++) {
-    var dbEmail = data[i][0];
-    var dbPass = data[i][1]; 
-    var dbName = data[i][2]; 
-
-  // ▼ ここが変わります！
-    // 1. 入力されたパスワードを、同じルールでハッシュ化する
-    var inputHash = createHash(password);
-
-    // 2. 「データベースのハッシュ値」と「入力されたハッシュ値」を比べる
-    if (dbEmail === email && dbPass === inputHash) {
-      return dbName; 
-    }
-  }
-
-  return false;
-}
-
-// ▼▼▼ 追加：パスワードをハッシュ化（暗号のような文字）にする関数 ▼▼▼
-function createHash(password) {
-  var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password);
-  var txtHash = rawHash.map(function(b) {
-    return ("0" + (b < 0 ? b + 256 : b).toString(16)).slice(-2);
-  }).join("");
-  return txtHash;
-}
-
-// ▼▼▼ 実験用：今の「password123」を変換してみる関数 ▼▼▼
-function showMyHash() {
-  var hash = createHash("password123"); // ここを変えれば別のパスワードも作れます
-  Logger.log(hash);
-}
-
-// ▼▼▼ 追加：新規ユーザー登録をする関数 ▼▼▼
-function registerUser(email, password, username) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ユーザー管理");
-  
-  // 1. 重複チェック（既に同じメアドの人がいないか確認）
   var data = sheet.getDataRange().getValues();
-  // 2行目から最後まで見る
+  
+  var userName = "";
+  var isRegistered = false;
+  
+  // 名簿にあるかチェック
   for (var i = 1; i < data.length; i++) {
     if (data[i][0] === email) {
-      return "ERROR_EXIST"; // 「もういるよ！」と返す
+      userName = data[i][2];
+      isRegistered = true;
+      break;
     }
   }
-
-  // 2. パスワードをハッシュ化（暗号化）
-  // ※さっき作った createHash 関数を使います！
-  var passHash = createHash(password); 
-
-  // 3. シートの一番下に追加
-  sheet.appendRow([email, passHash, username]);
   
-  return "SUCCESS"; // 「登録できたよ！」と返す
+  // 結果を返す（未登録なら isRegistered は false のまま）
+  return {
+    email: email,
+    name: userName,
+    isRegistered: isRegistered
+  };
 }
 
-// ▼▼▼ 追加：特定のユーザーの契約リストを取得する関数 ▼▼▼
+// ▼▼▼ 2. ★追加：名前を指定してユーザー登録する関数 ▼▼▼
+function registerGoogleUser(inputName) {
+  var email = Session.getActiveUser().getEmail(); // メアドは自動取得（偽装防止）
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ユーザー管理");
+  
+  // 重複チェック（念のため）
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === email) {
+      return "ALREADY_REGISTERED";
+    }
+  }
+  
+  // 保存！ A列:メアド, B列:ダミー, C列:入力された名前
+  sheet.appendRow([email, "google_login", inputName]);
+  
+  return "SUCCESS";
+}
+
+// ▼▼▼ 契約リスト取得（既存のまま） ▼▼▼
 function getContractList(targetEmail) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("契約リスト");
-  var data = sheet.getDataRange().getValues();
-  
-  var myContracts = []; // ここに見つかった契約を入れていく箱
+  var data = sheet.getDataRange().getDisplayValues(); 
+  var myContracts = [];
 
-  // 2行目から最後までチェック！
   for (var i = 1; i < data.length; i++) {
-    // A列（0番目）が、ログイン中のメアドと同じなら？
     if (data[i][0] === targetEmail) {
-      // リストに追加（B列：会社名、C列：契約内容）
       myContracts.push({
-        company: data[i][1],
-        detail: data[i][2]
+        row: i + 1,
+        project:    data[i][1],
+        contractor: data[i][2],
+        referrer:   data[i][3],
+        approval:   data[i][4],
+        expiryDate: data[i][5],
+        application: data[i][6],
+        amount:     data[i][7],
+        memo:       data[i][8]
       });
     }
   }
-  
-  return myContracts; // 見つかったリストを全部返す！
+  return myContracts;
+}
+
+// ▼▼▼ 更新機能（既存のまま） ▼▼▼
+function updateContract(row, project, contractor, referrer, approval, expiryDate, application, amount, memo) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("契約リスト");
+  sheet.getRange(row, 2, 1, 8).setValues([[
+    project, contractor, referrer, approval, expiryDate, application, amount, memo
+  ]]);
+  return "SUCCESS";
 }
